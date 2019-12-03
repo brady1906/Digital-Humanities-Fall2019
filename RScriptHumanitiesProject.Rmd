@@ -1,0 +1,56 @@
+---
+title: "Brady Humanities Tsunami Project"
+output: html_notebook
+---
+Data found and downloaded from NASA at https://earthdata.nasa.gov/
+
+From raw data to cleaned data: EventData and RunUpData
+[loaded tidyverse and created tibble]
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+```
+
+```{r}
+EventData <- read.csv(file.choose(), header = T)
+view(EventData)
+```
+
+```{r}
+RunUpData <- read.csv(file.choose(), header = T)
+view(RunUpData)
+```
+
+[saved data]
+
+```{r}
+save.image("~/Desktop/Grad School/Data Humanities/Humanities Project.RData")
+```
+
+[trimmed data to managible fields to reduce variables]
+
+```{r}
+names(EventData)
+TrimmedEventData <- EventData[-c(1, 3:10, 15:17, 19:34, 36, 38, 40, 42, 44, 46)]
+```
+
+```{r}
+names(RunUpData)
+TrimmedRunUpData <- RunUpData[-c(1:2, 4:9, 13:15, 17:19, 24:26, 28:30, 32, 34, 36)]
+```
+
+[Reduced variables to only include years after 1950]
+
+```{r}
+ReleventEventData <- filter(TrimmedEventData, YEAR > 1950)
+ReleventRunUpData <- filter(TrimmedRunUpData, YEAR > 1950)
+```
+
+```{r}
+save.image("~/Desktop/Grad School/Data Humanities/Humanities Project.RData")
+```
+
+III: Explore
+
+
+IV: Model
