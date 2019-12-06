@@ -1,0 +1,131 @@
+---
+title: "Brady Humanities Tsunami Project"
+output: html_notebook
+---
+
+# I - OBTAIN
+
+# Data found and downloaded from NASA at https://earthdata.nasa.gov/
+
+```{r}
+EventData <- read.csv(file.choose(), header = T)
+view(EventData)
+```
+
+```{r}
+RunUpData <- read.csv(file.choose(), header = T)
+view(RunUpData)
+```
+
+# II - SCRUB
+
+# from raw data to cleaned data: EventData and RunUpData
+
+# load tidyverse and created tibble
+
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+```
+
+# trim data to managible fields to reduce variables
+
+```{r}
+names(EventData)
+TrimmedEventData <- EventData[-c(1, 3:10, 15:17, 19:34, 36, 38, 40, 42, 44, 46)]
+```
+
+```{r}
+names(RunUpData)
+TrimmedRunUpData <- RunUpData[-c(1:2, 4:9, 13:15, 17:19, 24:26, 28:30, 32, 34, 36)]
+```
+
+# use [select] to trim down columns, after doing it the hard way first. OOOPS!
+
+```{r}
+TrimmedEventData <- EventData %>%
+select(YEAR, PRIMARY_MAGNITUDE:LONGITUDE, MAXIMUM_WATER_HEIGHT, TOTAL_DEATHS, TOTAL_DAMAGE_MILLIONS_DOLLARS, TOTAL_HOUSES_DESTROYED)
+```
+
+```{r}
+TrimmedRunUpData <- RunUpData %>%
+select(YEAR, COUNTRY:LONGITUDE, DISTANCE_FROM_SOURCE, TRAVEL_TIME_HOURS:HORIZONTAL_INUNDATION, DEATHS, DEATHS_DESCRIPTION, HOUSES_DESTROYED)
+```
+
+# use [filter] to reduce variables to only include years after 1950
+
+```{r}
+ReleventEventData <- filter(TrimmedEventData, YEAR > 1950)
+
+ReleventRunUpData <- filter(TrimmedRunUpData, YEAR > 1950)
+```
+
+# save project
+
+```{r}
+save.image("~/Desktop/Grad School/Data Humanities/Humanities Project.RData")
+```
+
+# III: Explore
+
+#graph ReleventEventData to show corrilation between PRIMARY_MAGNITUDE and TOTAL_DEATHS
+
+```{r}
+names(ReleventEventData)
+ggplot(data = ReleventEventData) + geom_point(mapping = aes(x = TOTAL_DEATHS, y = PRIMARY_MAGNITUDE))
+```
+
+#graph ReleventRunUpData to show corrilation between DISTANCE_FROM_SOURNCE and TRAVEL_TIME_HOURS
+
+```{r}
+names(ReleventRunUpData)
+ggplot(data = ReleventRunUpData) + geom_point(mapping = aes(x = TRAVEL_TIME_HOURS, y = DISTANCE_FROM_SOURCE))
+```
+
+#graph ReleventEventData by YEAR and PRIMARY_MAGNITUDE
+
+#conclusions show that the as our technology has improved the ability for geologists to accurately measure PRIMARY_MAGNITUDE as YEARS continue to progress. 
+
+```{r}
+ggplot(data = ReleventEventData) + geom_bar(mapping = aes(x = YEAR, y = PRIMARY_MAGNITUDE), stat = "identity")
+```
+
+#graph ReleventRunUpData to show corrilation between TRAVEL_TIME and DISTANCE_FROM_SOURCE
+
+#conclusions show that the father an earthquake epicenter is from an impacted area the longer it takes the tsuname wave to arrive. 
+
+```{r}
+ggplot(data = ReleventRunUpData) + geom_bar(mapping = aes(x = TRAVEL_TIME_HOURS, y = DISTANCE_FROM_SOURCE), stat = "identity")
+```
+
+#difficult to run various visualization models due to obscene amount of "NA" values in data.
+
+#write.csv to Desktop in order to upload to Google Drive in prep for building GoogleMap
+
+```{r}
+write.csv(ReleventEventData, "~/Desktop/ReleventEventData.csv")
+write.csv(ReleventRunUpData, "~/Desktop/ReleventRunUpData.csv")
+```
+
+# IV: Model
+
+```{r}
+library(leaflet.extras)
+```
+
+```{r}
+ROFMap <- system.file('~/Desktop/ReleventEventData.csv', package = 'leaftlet.extras')
+csv <- readr::read_file("~/Desktop/ReleventEventData.csv")
+leaf <- leaflet () %>%
+setView(0,0, 2) %>%
+addProviderTiles(providers$CartoDB.DarkMatterNoLabels)
+
+```
+
+# working on how to making the map work
+# found toutorial at: https://rpubs.com/bhaskarvk/csv
+
+
+# uploaded CSV to GoogleMaps, so I could at least get a map turned in. 
+
+# Map is: https://www.google.com/maps/@22.0769636,70.5335577,3z/data=!4m2!6m1!1s1Zh7LeLi8MxVYm1AAhU_YMmVcjt6XGsCF
